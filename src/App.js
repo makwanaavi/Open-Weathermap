@@ -1,35 +1,38 @@
 import React, { useState } from "react";
 import "./App.css";
 
-const API_KEY = "2ca89520240689f7d741929ded81167a"; // replace this with your OpenWeatherMap API key
+const API_KEY = "2ca89520240689f7d741929ded81167a"; // Your OpenWeatherMap API Key
 
 function App() {
-  const [city, setCity] = useState("");
-  const [weather, setWeather] = useState(null);
-  const [error, setError] = useState("");
+  const [city, setCity] = useState("");       // User input
+  const [weather, setWeather] = useState(null); // Weather data
+  const [error, setError] = useState("");     // Error message
 
+  // Fetch weather data from API
   const fetchWeather = async () => {
     if (!city) return;
+
     try {
-      const response = await fetch(
+      const res = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
       );
-      const data = await response.json();
+      const data = await res.json();
 
-      if (data.cod === 200) {
+      if (res.ok) {
         setWeather(data);
         setError("");
       } else {
-        setError("City not found");
         setWeather(null);
+        setError("City not found");
       }
-    } catch (err) {
+    } catch {
       setError("Failed to fetch weather");
     }
   };
 
+  // When Enter key is pressed in input
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       fetchWeather();
     }
   };
@@ -38,13 +41,15 @@ function App() {
     <div className="app">
       <div className="weather-card">
         <h1 className="app-title">Weather Forecast</h1>
+
+        {/* Input + Button */}
         <div className="search-container">
           <input
             type="text"
             placeholder="Enter city name..."
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             className="city-input"
           />
           <button onClick={fetchWeather} className="search-button">
@@ -52,17 +57,21 @@ function App() {
           </button>
         </div>
 
+        {/* Show error if exists */}
         {error && <p className="error-message">{error}</p>}
 
+        {/* Show weather info if available */}
         {weather && (
           <div className="weather-info">
+            {/* Location */}
             <div className="location">
               <h2>{weather.name}, {weather.sys.country}</h2>
               <p className="coordinates">
                 {weather.coord.lat}°N, {weather.coord.lon}°E
               </p>
             </div>
-            
+
+            {/* Temperature & Description */}
             <div className="current-weather">
               <div className="temperature">
                 {Math.round(weather.main.temp)}°C
@@ -72,6 +81,7 @@ function App() {
               </div>
             </div>
 
+            {/* More Weather Details */}
             <div className="weather-details">
               <div className="detail-item">
                 <span>Feels Like</span>
